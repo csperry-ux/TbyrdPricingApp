@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="T.Byrd's Pricing">
+<meta name="theme-color" content="#C0392B">
+<title>T.Byrd's Heating &amp; Air</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{--red:#C0392B;--rl:#FCEBEB;--rd:#791F1F;--green:#27ae60;--gl:#EAF3DE;--gd:#27500A;--blue:#185FA5;--bl:#E6F1FB;--bd:#0C447C;--amb:#BA7517;--al:#FAEEDA;--ad:#633806;--g50:#F8F9FA;--g100:#F1F3F5;--g200:#E9ECEF;--g300:#DEE2E6;--g400:#CED4DA;--g500:#ADB5BD;--g600:#6C757D;--g700:#495057;--g800:#343A40;--g900:#212529;--rsm:8px;--rmd:12px;--rlg:16px;--sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--g100);font-family:'Inter',-apple-system,sans-serif;color:var(--g900);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.shell{max-width:480px;margin:0 auto;min-height:100%;background:var(--g100)}
+.hdr{background:#fff;border-bottom:1px solid var(--g200);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.brand{display:flex;align-items:center;gap:10px}
+.bi{width:38px;height:38px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0}
+.bn{font-size:15px;font-weight:600;color:var(--g900);line-height:1.2}
+.bn span{color:var(--red)}
+.bs{font-size:11px;color:var(--g500)}
+.mbadge{font-size:12px;font-weight:600;color:var(--g600);background:var(--g100);padding:5px 10px;border-radius:var(--rsm);border:1px solid var(--g200)}
+.nav{display:flex;background:#fff;border-bottom:1px solid var(--g200);padding:0 4px}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 7px;cursor:pointer;color:var(--g500);font-size:10px;font-weight:500;border-bottom:2px solid transparent;transition:all .15s;text-align:center}
+.ntab i{font-size:20px}
+.ntab.active{color:var(--red);border-bottom-color:var(--red)}
+.screen{display:none;padding:16px;padding-bottom:40px}
+.screen.visible{display:block}
+.card{background:#fff;border-radius:var(--rmd);border:1px solid var(--g200);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
+.csec{padding:14px 16px}
+.csec+.csec{border-top:1px solid var(--g100)}
+.sttl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--g500);margin-bottom:12px}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.fpill{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;border:1px solid var(--g300);color:var(--g600);background:#fff;transition:all .15s}
+.fpill.active{background:var(--rl);border-color:var(--red);color:var(--rd)}
+.jcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g200);margin-bottom:10px;overflow:hidden;cursor:pointer;box-shadow:var(--sh)}
+.jcard:active{border-color:var(--g400)}
+.jacc{height:4px;background:var(--g300)}
+.jacc.quoted{background:var(--red)}.jacc.sold{background:var(--green)}.jacc.completed{background:var(--blue)}
+.jbody{padding:12px 16px}
+.jtop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px}
+.jname{font-size:15px;font-weight:600;color:var(--g900)}
+.jmeta{font-size:12px;color:var(--g500);margin-top:2px}
+.sbadge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.sb-q{background:var(--g100);color:var(--g600)}.sb-s{background:var(--gl);color:var(--gd)}.sb-c{background:var(--bl);color:var(--bd)}
+.jmet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.jm{background:var(--g50);border-radius:var(--rsm);padding:8px 10px;border:1px solid var(--g100)}
+.jml{font-size:10px;color:var(--g500);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.jmv{font-size:15px;font-weight:600;color:var(--g900)}
+.gn{color:var(--green)}.rd{color:var(--red)}.am{color:var(--amb)}.mu{color:var(--g400)}
+.empty{text-align:center;padding:48px 20px;color:var(--g500)}
+.empty i{font-size:48px;display:block;margin-bottom:12px;color:var(--g300)}
+.fab{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;border:none;border-radius:var(--rmd);padding:14px;font-size:15px;font-weight:600;cursor:pointer;width:100%;margin-bottom:16px;box-shadow:0 2px 8px rgba(192,57,43,.3);font-family:inherit}
+.bk{display:flex;align-items:center;gap:6px;color:var(--g500);font-size:13px;cursor:pointer;margin-bottom:16px;font-weight:500}
+.fhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.fttl{font-size:18px;font-weight:600;color:var(--g900)}
+.swrap{display:flex;align-items:center;gap:8px}
+.swrap label{font-size:12px;color:var(--g500);font-weight:500}
+select.ssel{font-size:13px;font-weight:500;padding:6px 10px;border-radius:var(--rsm);border:1px solid var(--g300);background:#fff;color:var(--g800)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.5px}
+.field input[type=text],.field select{width:100%;padding:10px 12px;border:1px solid var(--g300);border-radius:var(--rsm);font-size:14px;font-family:inherit;color:var(--g900);background:#fff;-webkit-appearance:none}
+.field input:focus,.field select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(192,57,43,.08)}
+.frow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dw{position:relative}
+.dw::before{content:'$';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--g500);font-size:14px;pointer-events:none;z-index:1}
+.dw input{padding-left:26px}
+.mpills{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.mpills::-webkit-scrollbar{display:none}
+.mpill{flex-shrink:0;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--g600);background:#fff;border-radius:var(--rsm);border:1px solid var(--g300);transition:all .15s}
+.mpill.active{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 2px 6px rgba(192,57,43,.25)}
+.togrow{display:flex;gap:8px;margin-bottom:14px}
+.tog{flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--g300);border-radius:var(--rsm);cursor:pointer;font-size:12px;font-weight:500;color:var(--g600);background:#fff;user-select:none;transition:all .15s}
+.tog.active{border-color:var(--red);color:var(--rd);background:var(--rl)}
+.tdot{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tog.active .tdot::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--red);display:block}
+.phero{background:var(--red);border-radius:var(--rlg);padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(192,57,43,.25)}
+.pht{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px}
+.phl{font-size:10px;font-weight:600;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.phpr{display:flex;align-items:center;gap:4px}
+.ph${font-size:24px;font-weight:600;color:#fff}
+.phi{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;font-size:24px;font-weight:600;width:140px;padding:4px 8px;text-align:right;font-family:inherit}
+.phi:focus{outline:none;border-color:rgba(255,255,255,.8)}
+.phh{font-size:10px;color:rgba(255,255,255,.5);margin-top:4px}
+.phg{text-align:right}
+.phga{font-size:24px;font-weight:600;color:#fff}
+.phgp{font-size:12px;color:rgba(255,255,255,.7);margin-top:2px}
+.pbb{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.pbf{height:100%;border-radius:3px;background:rgba(255,255,255,.8);transition:width .3s}
+.brow{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--g100);font-size:13px;gap:8px}
+.brow:last-child{border-bottom:none}
+.blbl{color:var(--g600);display:flex;align-items:center;gap:7px;flex:1}
+.bval{font-weight:600;color:var(--g900);white-space:nowrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;flex-shrink:0}
+.tf{background:var(--g100);color:var(--g600)}.tv{background:var(--bl);color:var(--bd)}.tt{background:var(--al);color:var(--ad)}.tr{background:var(--gl);color:var(--gd)}
+.shdr{background:var(--g50);padding:6px 16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--g500);border-bottom:1px solid var(--g100)}
+.brow.cr{background:var(--g50)}.brow.cr .blbl{font-weight:600;color:var(--g800)}.brow.cr .bval{color:var(--red);font-size:15px}
+.rebrow{background:#F0FAF4}.rebval{color:var(--green);font-weight:700;font-size:15px}
+.effrow{background:var(--gl);border-top:1px solid #C0DD97}.effa{font-weight:700;color:var(--gd);font-size:16px}.effp{font-size:11px;color:var(--green);font-weight:600}
+.mtog{display:flex;background:var(--g100);border-radius:var(--rmd);padding:4px;gap:4px;margin-bottom:14px;border:1px solid var(--g200)}
+.mm{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;color:var(--g500);border-radius:var(--rsm);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.mm.active{background:#fff;color:var(--g900);font-weight:600;box-shadow:var(--sh)}
+.ibanner{display:flex;align-items:center;gap:10px;background:var(--bl);border:1px solid #B5D4F4;border-radius:var(--rsm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--bd);font-weight:500}
+.jchero{background:var(--blue);border-radius:var(--rlg);padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(24,95,165,.2)}
+.jchg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.jchm{background:rgba(255,255,255,.15);border-radius:var(--rsm);padding:12px}
+.jchl{font-size:10px;font-weight:600;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.jchv{font-size:20px;font-weight:600;color:#fff}
+.jchs{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.vw{overflow-x:auto;border-radius:var(--rmd);border:1px solid var(--g200);background:#fff;box-shadow:var(--sh);margin-bottom:14px}
+.vt{width:100%;border-collapse:collapse;font-size:12px;min-width:300px}
+.vt th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--g500);background:var(--g50);border-bottom:1px solid var(--g200)}
+.vt th.r{text-align:right}
+.vt td{padding:9px 12px;border-bottom:1px solid var(--g100);color:var(--g800)}
+.vt td.r{text-align:right;font-weight:600}.vt td.pos{text-align:right;color:var(--green);font-weight:600}.vt td.neg{text-align:right;color:var(--red);font-weight:600}.vt td.neu{text-align:right;color:var(--g400);font-weight:600}
+.vt tr.tr td{background:var(--g50);font-weight:600;font-size:13px}.vt tr:last-child td{border-bottom:none}
+.muprev{background:var(--g50);border-radius:var(--rsm);padding:10px 12px;margin-top:12px;display:none;border:1px solid var(--g200)}
+.mutitle{font-size:13px;font-weight:600;color:var(--g800);margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{background:#fff;border:1px solid var(--g200);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--g600);font-weight:500}
+.warn{background:var(--al);border:1px solid #FAC775;border-radius:var(--rsm);padding:10px 14px;font-size:12px;color:var(--ad);margin-bottom:12px;display:none;font-weight:500}
+.factions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.bsave{background:var(--red);color:#fff;border:none;border-radius:var(--rsm);padding:13px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(192,57,43,.25);font-family:inherit}
+.bcancel{background:#fff;color:var(--g600);border:1px solid var(--g300);border-radius:var(--rsm);padding:13px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.bdel{background:var(--rl);color:var(--rd);border:1px solid #F7C1C1;border-radius:var(--rsm);padding:11px;font-size:13px;font-weight:600;cursor:pointer;width:100%;grid-column:1/-1;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+
+/* TRACKER */
+.thero{border-radius:var(--rlg);padding:20px;margin-bottom:14px}
+.thero.danger{background:var(--red)}.thero.on-track{background:var(--amb)}.thero.ahead{background:var(--green)}
+.thzone{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.7);margin-bottom:4px}
+.thstat{font-size:20px;font-weight:600;color:#fff;margin-bottom:14px}
+.thgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.thmet{background:rgba(255,255,255,.18);border-radius:var(--rsm);padding:10px 12px}
+.thlbl{font-size:10px;color:rgba(255,255,255,.65);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.thval{font-size:18px;font-weight:600;color:#fff}
+.thsub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.pbwrap{margin-bottom:4px}
+.pblbls{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.65);margin-bottom:6px;font-weight:500}
+.pbbg{height:8px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden}
+.pbfill{height:100%;border-radius:4px;background:rgba(255,255,255,.85);transition:width .4s}
+.pcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g200);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--g100);font-size:13px}
+.prow:last-child{border-bottom:none}
+.plbl{color:var(--g600)}.pval{font-weight:600;color:var(--g900)}.pval.gn{color:var(--green)}.pval.rd{color:var(--red)}.pval.am{color:var(--amb)}
+.flcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g200);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
+.flhdr{background:var(--g900);padding:12px 16px;display:flex;align-items:center;gap:8px}
+.flhdt{font-size:13px;font-weight:600;color:#fff}
+.flhds{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
+.flbody{padding:14px 16px}
+.flir{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.flir label{font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.flres{background:var(--g50);border-radius:var(--rsm);padding:14px;border:1px solid var(--g200);display:none}
+.frr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px}
+.frr:last-child{margin-bottom:0}
+.frl{color:var(--g600)}.frv{font-weight:600;color:var(--g900)}
+.frverdict{margin-top:12px;padding:10px 12px;border-radius:var(--rsm);font-size:12px;font-weight:600;text-align:center}
+.frv-ok{background:var(--gl);color:var(--gd)}.frv-warn{background:var(--al);color:var(--ad)}.frv-bad{background:var(--rl);color:var(--rd)}
+.setcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g200);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
+.setr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--g100);gap:12px}
+.setr:last-child{border-bottom:none}
+.setl{font-size:13px;font-weight:500;color:var(--g800)}
+.sets{font-size:11px;color:var(--g500);margin-top:2px}
+.seti{font-size:14px;font-weight:600;text-align:right;width:130px;padding:8px 10px;border:1px solid var(--g300);border-radius:var(--rsm);font-family:inherit}
+.minij{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--g100);font-size:13px}
+.minij:last-child{border-bottom:none}
+.minn{color:var(--g800);font-weight:500}
+.minm{font-size:11px;color:var(--g500);margin-top:1px}
+.mingp{font-weight:600;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="hdr">
+  <div class="brand">
+    <div class="bi"><i class="ti ti-home-bolt"></i></div>
+    <div><div class="bn"><span>T.Byrd's</span> Heating &amp; Air</div><div class="bs">Pricing &amp; Job Costing</div></div>
+  </div>
+  <div class="mbadge" id="mbadge"></div>
+</header>
+<nav class="nav">
+  <div class="ntab active" id="nav-jobs" onclick="go('jobs')"><i class="ti ti-briefcase"></i>Jobs</div>
+  <div class="ntab" id="nav-tracker" onclick="go('tracker')"><i class="ti ti-trending-up"></i>Tracker</div>
+  <div class="ntab" id="nav-quote" onclick="go('quote');rf()"><i class="ti ti-calculator"></i>New quote</div>
+</nav>
+
+<!-- JOBS -->
+<div class="screen visible" id="screen-jobs">
+  <button class="fab" onclick="go('quote');rf()"><i class="ti ti-plus"></i> New quote</button>
+  <div class="filter-row">
+    <div class="fpill active" onclick="fj('all',this)">All jobs</div>
+    <div class="fpill" onclick="fj('Quoted',this)">Quoted</div>
+    <div class="fpill" onclick="fj('Sold',this)">Sold</div>
+    <div class="fpill" onclick="fj('Completed',this)">Completed</div>
+  </div>
+  <div id="jlist"></div>
+</div>
+
+<!-- TRACKER -->
+<div class="screen" id="screen-tracker">
+  <div class="thero danger" id="thero">
+    <div class="thzone" id="thzone">Loading…</div>
+    <div class="thstat" id="thstat">—</div>
+    <div class="thgrid">
+      <div class="thmet"><div class="thlbl">GP this month</div><div class="thval" id="thgp">—</div><div class="thsub" id="thgpsub">—</div></div>
+      <div class="thmet"><div class="thlbl">GP target</div><div class="thval" id="thtgt">—</div><div class="thsub">monthly goal</div></div>
+      <div class="thmet"><div class="thlbl">Overhead</div><div class="thval" id="thoh">—</div><div class="thsub" id="thohsub">—</div></div>
+      <div class="thmet"><div class="thlbl">Jobs completed</div><div class="thval" id="thjobs">—</div><div class="thsub">this month</div></div>
+    </div>
+    <div class="pbwrap">
+      <div class="pblbls"><span>$0</span><span id="pbohlbl">Overhead</span><span>Target</span></div>
+      <div class="pbbg"><div class="pbfill" id="pbfill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="pcard">
+    <div class="shdr">Monthly pace</div>
+    <div class="prow"><span class="plbl">Days elapsed</span><span class="pval" id="pde">—</span></div>
+    <div class="prow"><span class="plbl">Days remaining</span><span class="pval" id="pdl">—</span></div>
+    <div class="prow"><span class="plbl">GP per day (actual)</span><span class="pval" id="pda">—</span></div>
+    <div class="prow"><span class="plbl">GP per day needed</span><span class="pval" id="pdn">—</span></div>
+    <div class="prow"><span class="plbl">Projected month-end GP</span><span class="pval" id="pdp">—</span></div>
+    <div class="prow"><span class="plbl">GP still needed to hit target</span><span class="pval" id="pdg">—</span></div>
+  </div>
+  <div class="flcard">
+    <div class="flhdr"><i class="ti ti-calculator" style="color:#fff;font-size:18px"></i><div><div class="flhdt">Floor calculator</div><div class="flhds">What's my minimum GP% on the next job?</div></div></div>
+    <div class="flbody">
+      <div class="flir">
+        <label>Job size</label>
+        <div class="dw" style="flex:1"><input type="text" id="fjsize" placeholder="10,000" oninput="cf()" inputmode="numeric"></div>
+      </div>
+      <div class="flres" id="flres">
+        <div class="frr"><span class="frl">GP needed this month</span><span class="frv" id="frgpn">—</span></div>
+        <div class="frr"><span class="frl">Min GP dollars on this job</span><span class="frv" id="frmgp">—</span></div>
+        <div class="frr"><span class="frl" style="font-weight:600;color:var(--g900)">Minimum GP% floor</span><span class="frv" style="font-size:20px;color:var(--red)" id="frfl">—</span></div>
+        <div class="frverdict" id="frverd"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="mjcard" style="display:none">
+    <div class="shdr">Completed jobs this month</div>
+    <div id="mjlist"></div>
+  </div>
+  <div class="setcard">
+    <div class="shdr">Monthly targets &amp; overhead</div>
+    <div class="setr">
+      <div><div class="setl">GP target</div><div class="sets">Monthly gross profit goal</div></div>
+      <div class="dw"><input type="text" class="seti" id="stgt" placeholder="50,000" oninput="ss();rt()"></div>
+    </div>
+    <div class="setr">
+      <div><div class="setl">Monthly overhead</div><div class="sets">Fixed costs to cover first</div></div>
+      <div class="dw"><input type="text" class="seti" id="soh" placeholder="30,000" oninput="ss();rt()"></div>
+    </div>
+    <div class="setr">
+      <div><div class="setl">Working days/month</div><div class="sets">Used for daily pace</div></div>
+      <input type="text" class="seti" id="sdays" placeholder="22" oninput="ss();rt()" style="width:80px">
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE/JC -->
+<div class="screen" id="screen-quote">
+  <div class="bk" onclick="go('jobs')"><i class="ti ti-arrow-left" style="font-size:18px"></i> Back to jobs</div>
+  <div class="fhdr">
+    <div class="fttl" id="fttl">New quote</div>
+    <div class="swrap"><label>Status</label>
+      <select class="ssel" id="jstat" onchange="onStatChange()"><option>Quoted</option><option>Sold</option><option>Completed</option></select>
+    </div>
+  </div>
+  <div class="card"><div class="csec"><div class="sttl">Customer</div><div class="field" style="margin-bottom:0"><label>Customer name</label><input type="text" id="cname" placeholder="Full name"></div></div></div>
+  <div class="card" id="cdcard" style="display:none"><div class="csec"><div class="sttl">Completion</div><div class="field" style="margin-bottom:0"><label>Date completed</label><input type="text" id="cdate" placeholder="e.g. May 9, 2026"></div></div></div>
+  <div class="card"><div class="csec">
+    <div class="sttl">System selection</div>
+    <div class="field"><label>System type</label><select id="sysType" onchange="uSeries()"></select></div>
+    <div class="frow">
+      <div class="field" style="margin-bottom:0"><label>Series</label><select id="series" onchange="uSizes()"></select></div>
+      <div class="field" style="margin-bottom:0"><label>Tonnage</label><select id="tonnage" onchange="uMatchups()"></select></div>
+    </div>
+    <div class="field" style="margin-top:12px;margin-bottom:0"><label>AHRI matchup</label><select id="matchup" onchange="omc()"></select></div>
+    <div class="muprev" id="muprev"><div class="mutitle" id="muttl"></div><div class="chips" id="mchips"></div></div>
+  </div></div>
+  <div class="mtog">
+    <div class="mm active" id="mmq" onclick="sm('quote')"><i class="ti ti-calculator" style="font-size:16px"></i> Quote</div>
+    <div class="mm" id="mmjc" onclick="sm('jobcost')"><i class="ti ti-chart-bar" style="font-size:16px"></i> Job cost</div>
+  </div>
+  <!-- QUOTE MODE -->
+  <div id="qc">
+    <div class="mpills">
+      <div class="mpill" onclick="setM(55,this)">55%</div>
+      <div class="mpill" onclick="setM(50,this)">50%</div>
+      <div class="mpill" onclick="setM(45,this)">45%</div>
+      <div class="mpill active" onclick="setM(40,this)">40%</div>
+      <div class="mpill" onclick="setM(35,this)">35%</div>
+      <div class="mpill" onclick="setM(30,this)">30%</div>
+      <div class="mpill" onclick="setM(25,this)">25%</div>
+    </div>
+    <div class="togrow">
+      <div class="tog" id="togFin" onclick="tog('fin')"><div class="tdot"></div><span>Financing (10%)</span></div>
+      <div class="tog" id="togCrane" onclick="tog('crane')"><div class="tdot"></div><span>Crane (+$500)</span></div>
+    </div>
+    <div class="warn" id="warn"></div>
+    <div class="phero">
+      <div class="pht">
+        <div>
+          <div class="phl">Customer sale price</div>
+          <div class="phpr"><span class="ph$">$</span><input class="phi" type="text" id="spi" value="0" oninput="ope()" onblur="opb()" inputmode="numeric"></div>
+          <div class="phh">tap to adjust</div>
+        </div>
+        <div class="phg"><div class="phl">Gross profit</div><div class="phga" id="gpd">—</div><div class="phgp" id="gppc">—</div></div>
+      </div>
+      <div class="pbb"><div class="pbf" id="gpf" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="shdr">Cost breakdown</div>
+      <div class="brow"><span class="blbl">Equipment (Johnstone) <span class="tag tf">fixed</span></span><span class="bval" id="rE">—</span></div>
+      <div class="brow"><span class="blbl">Tax on equipment (7%) <span class="tag tt">tax</span></span><span class="bval" id="rT">—</span></div>
+      <div class="brow"><span class="blbl">Materials buffer <span class="tag tf">fixed</span></span><span class="bval">$600</span></div>
+      <div class="brow"><span class="blbl">Permit <span class="tag tf">fixed</span></span><span class="bval">$150</span></div>
+      <div class="brow" id="craneBrow" style="display:none"><span class="blbl">Crane <span class="tag tf">fixed</span></span><span class="bval">$500</span></div>
+      <div class="shdr">Variable (% of sale)</div>
+      <div class="brow"><span class="blbl">Installer pay (7%) <span class="tag tv">variable</span></span><span class="bval" id="rI">—</span></div>
+      <div class="brow"><span class="blbl" id="clbl">Commission (8%) <span class="tag tv">variable</span></span><span class="bval" id="rC">—</span></div>
+      <div class="brow"><span class="blbl">Marketing (7%) <span class="tag tv">variable</span></span><span class="bval" id="rMk">—</span></div>
+      <div class="brow" id="finBrow" style="display:none"><span class="blbl">Financing (10%) <span class="tag tv">variable</span></span><span class="bval" id="rFin">—</span></div>
+      <div class="brow cr"><span class="blbl">Total COGS</span><span class="bval" id="rCogs">—</span></div>
+      <div class="shdr">Goodman rebate (annual · 6% of equipment)</div>
+      <div class="brow rebrow"><span class="blbl">Estimated rebate <span class="tag tr">+income</span></span><span class="bval rebval" id="rReb">—</span></div>
+      <div class="brow effrow"><span class="blbl" style="font-weight:600;color:var(--g800)">Effective GP with rebate</span><span class="bval" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px"><span class="effa" id="rEGP">—</span><span class="effp" id="rEGPP">—</span></span></div>
+    </div>
+  </div>
+  <!-- JC MODE -->
+  <div id="jcc" style="display:none">
+    <div class="ibanner"><i class="ti ti-info-circle" style="font-size:18px;flex-shrink:0"></i>Enter actuals. Green = better than quoted, red = worse.</div>
+    <div class="card"><div class="csec"><div class="sttl">Actual costs</div>
+      <div class="frow">
+        <div class="field"><label>Equipment</label><div class="dw"><input type="text" id="aE" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Tax paid</label><div class="dw"><input type="text" id="aTx" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Materials</label><div class="dw"><input type="text" id="aM" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Permit</label><div class="dw"><input type="text" id="aPm" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Crane</label><div class="dw"><input type="text" id="aCr" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Installer pay</label><div class="dw"><input type="text" id="aI" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Commission</label><div class="dw"><input type="text" id="aC" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Marketing</label><div class="dw"><input type="text" id="aMk" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Financing fee</label><div class="dw"><input type="text" id="aFin" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+        <div class="field"><label>Actual sale price</label><div class="dw"><input type="text" id="aSP" placeholder="0" oninput="cjc()" inputmode="numeric"></div></div>
+      </div>
+    </div></div>
+    <div id="jchero" style="display:none">
+      <div class="jchero">
+        <div class="jchg">
+          <div class="jchm"><div class="jchl">Actual GP</div><div class="jchv" id="agpa">—</div><div class="jchs" id="agpp">—</div></div>
+          <div class="jchm"><div class="jchl">Quoted GP</div><div class="jchv" id="qgpa">—</div><div class="jchs" id="qgpp">—</div></div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Actual GP margin</div>
+        <div class="pbb"><div class="pbf" id="jcgpf" style="width:0%"></div></div>
+      </div>
+      <div class="vw"><table class="vt" style="table-layout:fixed">
+        <colgroup><col style="width:37%"><col style="width:21%"><col style="width:21%"><col style="width:21%"></colgroup>
+        <thead><tr><th>Item</th><th class="r">Quoted</th><th class="r">Actual</th><th class="r">Variance</th></tr></thead>
+        <tbody id="vbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="factions">
+    <button class="bcancel" onclick="go('jobs')">Cancel</button>
+    <button class="bsave" onclick="sj()">Save job</button>
+    <button class="bdel" id="dbtn" onclick="dj()" style="display:none"><i class="ti ti-trash" style="font-size:16px"></i> Delete job</button>
+  </div>
+</div>
+</div>
+
+<script>
+const DATA={
+"Split Gas/Electric AC":{
+  "GLXT7C – 17.2 SEER2 Two Stage":{"2 Ton":[{label:"GRVT96 + CAPTA2422B | 17.5 SEER2 | 24,000 BTU | AHRI 216613800",equip:4073},{label:"GRVT96 + CHPTA2426B | 17.2 SEER2 | 23,600 BTU | AHRI 216613809",equip:4113},{label:"GRVT80 + CAPTA2422B | 18.0 SEER2 | 24,000 BTU | AHRI 216613799",equip:3772},{label:"GRVT80 + CHPTA2426B | 18.0 SEER2 | 23,600 BTU | AHRI 216613808",equip:3812}],"3 Ton":[{label:"GRVT96 + CAPTA3626B | 16.7 SEER2 | 35,000 BTU | AHRI 216615774",equip:4832},{label:"GRVT96 + CHPTA3630B | 16.5 SEER2 | 34,600 BTU | AHRI 216615780",equip:4825},{label:"GRVT80 + CAPTA3626B | 17.0 SEER2 | 35,000 BTU | AHRI 216615773",equip:4351},{label:"GRVT80 + CHPTA3630B | 17.0 SEER2 | 35,000 BTU | AHRI 216615779",equip:4344}],"4 Ton":[{label:"GRVT96 + CAPTA6030C | 17.2 SEER2 | 46,500 BTU | AHRI 216614415",equip:5662},{label:"GRVT96 + CHPTA4830C | 16.7 SEER2 | 45,500 BTU | AHRI 216614418",equip:5623},{label:"GRVT80 + CAPTA6030C | 17.5 SEER2 | 46,000 BTU | AHRI 216614414",equip:5159},{label:"GRVT80 + CHPTA4830C | 17.2 SEER2 | 45,000 BTU | AHRI 216614417",equip:5120}],"5 Ton":[{label:"GRVT96 + CAPTA6030D | 16.0 SEER2 | 57,500 BTU | AHRI 216613973",equip:6160},{label:"GRVT80 + CAPTA6030C | 16.2 SEER2 | 57,500 BTU | AHRI 216614423",equip:5560}]},
+  "GXV6SS – 17.2 SEER2 Variable-Speed":{"1.5 Ton":[{label:"GRVT96 + CAPEA2418B | 18.5 SEER2 | 17,100 BTU | AHRI 215490241",equip:3596},{label:"GRVT80 + CAPEA2418B | 18.5 SEER2 | 17,100 BTU | AHRI 215490257",equip:3295}],"2 Ton":[{label:"GRVT96 + CAPEA2418B | 18.0 SEER2 | 23,200 BTU | AHRI 215490287",equip:3666},{label:"GRVT80 + CAPEA2418B | 18.0 SEER2 | 23,200 BTU | AHRI 215490315",equip:3365}],"2.5 Ton":[{label:"GRVT96 + CAPEA3022B | 17.5 SEER2 | 28,400 BTU | AHRI 215490342",equip:3799},{label:"GRVT80 + CAPEA3022B | 17.5 SEER2 | 28,400 BTU | AHRI 215490335",equip:3498}],"3 Ton":[{label:"GRVT96 + CAPEA3626B | 16.0 SEER2 | 33,600 BTU | AHRI 215490399",equip:4256},{label:"GRVT80 + CAPEA3626B | 16.0 SEER2 | 33,600 BTU | AHRI 215490416",equip:3775}],"3.5 Ton":[{label:"GRVT96 + CAPEA4830C | 17.0 SEER2 | 41,000 BTU | AHRI 215490438",equip:4474},{label:"GRVT80 + CAPEA4830C | 17.0 SEER2 | 41,000 BTU | AHRI 215490439",equip:4141}],"4 Ton":[{label:"GRVT96 + CAPEA4830C | 16.0 SEER2 | 45,500 BTU | AHRI 215490483",equip:4784},{label:"GRVT80 + CAPEA4830C | 16.2 SEER2 | 45,500 BTU | AHRI 215490491",equip:4281}],"5 Ton":[{label:"GRVT96 + CAPEA6030C | 15.5 SEER2 | 52,000 BTU | AHRI 215490547",equip:5127},{label:"GRVT80 + CAPEA6030C | 15.5 SEER2 | 52,000 BTU | AHRI 215490549",equip:4624}]},
+  "GLXS5B – 16.5 SEER2 Single Stage":{"1.5 Ton":[{label:"GR9S96 + CAPTA2422A | 15.2 SEER2 | 17,600 BTU | AHRI 215380002",equip:3093},{label:"GR9S80 + CAPTA2422A | 15.2 SEER2 | 17,600 BTU | AHRI 215379993",equip:2689}],"2 Ton":[{label:"GR9S96 + CAPTA3026B | 15.2 SEER2 | 23,600 BTU | AHRI 215380272",equip:3379},{label:"GR9S92 + CAPTA3026B | 15.2 SEER2 | 23,600 BTU | AHRI 215380268",equip:3250},{label:"GR9S80 + CAPTA3026B | 15.5 SEER2 | 23,600 BTU | AHRI 215380263",equip:2964}],"3 Ton":[{label:"GR9S96 + CAPTA3626B | 15.2 SEER2 | 34,200 BTU | AHRI 215380685",equip:3657},{label:"GR9S92 + CAPTA3626B | 15.2 SEER2 | 34,200 BTU | AHRI 215380679",equip:3528},{label:"GR9S80 + CAPTA3626B | 15.2 SEER2 | 34,400 BTU | AHRI 215380672",equip:3262}],"4 Ton":[{label:"GR9S96 + CAPTA6030C | 15.2 SEER2 | 45,500 BTU | AHRI 215381021",equip:4395},{label:"GR9S80 + CAPTA6030C | 15.2 SEER2 | 45,500 BTU | AHRI 215381011",equip:3860}],"5 Ton":[{label:"GR9S96 + CAPTA6030C | 15.5 SEER2 | 56,500 BTU | AHRI 215381115",equip:4841},{label:"GR9S80 + CAPTA6030D | 16.0 SEER2 | 56,500 BTU | AHRI 215381109",equip:4413}]},
+  "GLXS4B – 15.2 SEER2 Single Stage":{"1.5 Ton":[{label:"GR9S96 + CAPTA2422A | 14.5 SEER2 | 18,000 BTU | AHRI 215214573",equip:2850},{label:"GR9S80 + CAPTA2422A | 14.7 SEER2 | 18,000 BTU | AHRI 215214567",equip:2446}],"2 Ton":[{label:"GR9S96 + CAPTA2422B | 14.5 SEER2 | 23,600 BTU | AHRI 215214638",equip:3038},{label:"GR9S92 + CAPTA2422B | 15.2 SEER2 | 23,600 BTU | AHRI 215214635",equip:2909},{label:"GR9S80 + CHPTA2426B | 14.5 SEER2 | 23,200 BTU | AHRI 215214695",equip:2652}],"3 Ton":[{label:"GR9S96 + CAPTA3626B | 14.5 SEER2 | 34,200 BTU | AHRI 214859776",equip:3423},{label:"GR9S92 + CHPTA3630B | 15.2 SEER2 | 34,200 BTU | AHRI 214859803",equip:3215},{label:"GR9S80 + CAPTA3626B | 15.2 SEER2 | 34,200 BTU | AHRI 214859831",equip:2956}],"4 Ton":[{label:"GR9S96 + CAPTA6030C | 14.3 SEER2 | 45,500 BTU | AHRI 214860094",equip:4148},{label:"GR9S80 + CHPTA4830C | 14.5 SEER2 | 45,500 BTU | AHRI 214860130",equip:3445}],"5 Ton":[{label:"GR9S96 + CAPTA6030D | 14.0 SEER2 | 56,500 BTU | AHRI 214860173",equip:4547},{label:"GR9S80 + CAPTA6030D | 14.0 SEER2 | 56,500 BTU | AHRI 214860181",equip:3984}]}
+},
+"Split Heat Pump":{
+  "GLZT7C – 17.5 SEER2 Two Stage HP":{"2 Ton":[{label:"AMVT30BP | 17.5 SEER2 | 8.2 HSPF2 | 24,000 BTU | AHRI 215657363",equip:4015}],"3 Ton":[{label:"AMVT42CP | 17.2 SEER2 | 8.1 HSPF2 | 34,800 BTU | AHRI 215657364",equip:4511}],"4 Ton":[{label:"AMVT60DP | 17.2 SEER2 | 8.2 HSPF2 | 47,000 BTU | AHRI 215657366",equip:5369}],"5 Ton":[{label:"AMVT60DP | 16.2 SEER2 | 8.2 HSPF2 | 57,000 BTU | AHRI 215657368",equip:5903}]},
+  "GZV7S – 19 SEER2 Variable-Speed HP":{"2 Ton":[{label:"AHVE36CP | 19.0 SEER2 | 8.8 HSPF2 | 23,200 BTU | AHRI 215429196",equip:3572}],"3 Ton":[{label:"AHVE42CP | 18.5 SEER2 | 8.5 HSPF2 | 34,800 BTU | AHRI 215429743",equip:4142}],"3.5 Ton":[{label:"AHVE60DP | 17.5 SEER2 | 8.8 HSPF2 | 41,000 BTU | AHRI 215429198",equip:4354}],"4 Ton":[{label:"AHVE60DP | 17.5 SEER2 | 8.8 HSPF2 | 46,500 BTU | AHRI 215429199",equip:4588}],"5 Ton":[{label:"AHVE60DP | 18.0 SEER2 | 9.0 HSPF2 | 52,000 BTU | AHRI 216835221",equip:5724}]},
+  "GZV6S – 19 SEER2 Variable-Speed HP":{"1.5 Ton":[{label:"AHVE24BP | 19.0 SEER2 | 8.8 HSPF2 | 17,100 BTU | AHRI 215429190",equip:3066}],"2 Ton":[{label:"AHVE24BP | 18.0 SEER2 | 8.5 HSPF2 | 23,200 BTU | AHRI 215429191",equip:3138}],"2.5 Ton":[{label:"AHVE36CP | 17.5 SEER2 | 8.5 HSPF2 | 28,400 BTU | AHRI 216611755",equip:3459}],"3 Ton":[{label:"AHVE42CP | 16.6 SEER2 | 8.5 HSPF2 | 34,200 BTU | AHRI 215429787",equip:3689}],"4 Ton":[{label:"AHVE60DP | 17.0 SEER2 | 8.2 HSPF2 | 45,500 BTU | AHRI 215429811",equip:4187}],"5 Ton":[{label:"AHVE60DP | 16.6 SEER2 | 8.2 HSPF2 | 53,500 BTU | AHRI 215429195",equip:4583}]},
+  "GLZS5B – 16 SEER2 Single Stage HP":{"1.5 Ton":[{label:"AMST24BU | 15.2 SEER2 | 7.8 HSPF2 | 18,000 BTU | AHRI 215381159",equip:2880}],"2 Ton":[{label:"AMST24BU | 15.2 SEER2 | 7.8 HSPF2 | 23,200 BTU | AHRI 215381160",equip:2943}],"2.5 Ton":[{label:"AMST30BU | 15.2 SEER2 | 7.8 HSPF2 | 28,600 BTU | AHRI 215381161",equip:3209}],"3 Ton":[{label:"AMST42CU | 15.2 SEER2 | 7.8 HSPF2 | 35,400 BTU | AHRI 215381162",equip:3555}],"4 Ton":[{label:"AMST48CU | 15.2 SEER2 | 7.8 HSPF2 | 45,500 BTU | AHRI 215381164",equip:4025}],"5 Ton":[{label:"AMST60DU | 16.0 SEER2 | 8.2 HSPF2 | 57,000 BTU | AHRI 215381165",equip:4718}]},
+  "GLZS4B – 15.2 SEER2 Single Stage HP":{"1.5 Ton":[{label:"AMST24BU | 15.2 SEER2 | 7.5 HSPF2 | 18,600 BTU | AHRI 215213817",equip:2496}],"2 Ton":[{label:"AMST24BU | 15.2 SEER2 | 7.5 HSPF2 | 23,600 BTU | AHRI 215213871",equip:2546}],"3 Ton":[{label:"AMST36CU | 15.0 SEER2 | 7.5 HSPF2 | 35,000 BTU | AHRI 215213859",equip:3181}],"4 Ton":[{label:"AMST48CU | 15.2 SEER2 | 7.8 HSPF2 | 45,500 BTU | AHRI 215213861",equip:3630}],"5 Ton":[{label:"AMST60DU | 14.5 SEER2 | 8.2 HSPF2 | 56,500 BTU | AHRI 215213862",equip:4198}]}
+},
+"Packaged Heat Pump":{
+  "GPHH5 – 15.2 SEER2 Horizontal":{"2 Ton":[{label:"GPHH52431A | 15.0 SEER2 | 7.0 HSPF2 | 23,600 BTU | AHRI 217231855",equip:3318}],"3 Ton":[{label:"GPHH53631A | 15.2 SEER2 | 7.0 HSPF2 | 32,600 BTU | AHRI 217231857",equip:3749}],"4 Ton":[{label:"GPHH54831A | 15.2 SEER2 | 6.7 HSPF2 | 45,000 BTU | AHRI 217231859",equip:4424}],"5 Ton":[{label:"GPHH56031A | 15.2 SEER2 | 6.8 HSPF2 | 55,000 BTU | AHRI 217231867",equip:4683}]},
+  "GPHM5 – 15.2 SEER2 Multi-Position":{"2 Ton":[{label:"GPHM52431A | 14.4 SEER2 | 6.7 HSPF2 | 24,000 BTU | AHRI 217231860",equip:3619}],"3 Ton":[{label:"GPHM53631A | 15.2 SEER2 | 6.7 HSPF2 | 36,000 BTU | AHRI 217231862",equip:3962}],"4 Ton":[{label:"GPHM54831A | 15.2 SEER2 | 6.8 HSPF2 | 45,500 BTU | AHRI 217231864",equip:4663}],"5 Ton":[{label:"GPHM56031A | 15.4 SEER2 | 7.7 HSPF2 | 60,000 BTU | AHRI 216811365",equip:5494}]},
+  "GPHH3 – 13.4 SEER2 Horizontal":{"2 Ton":[{label:"GPHH32431A | 13.4 SEER2 | 6.7 HSPF2 | 24,000 BTU | AHRI 216759884",equip:2679}],"3 Ton":[{label:"GPHH33631A | 13.4 SEER2 | 6.7 HSPF2 | 36,000 BTU | AHRI 216759867",equip:3021}],"4 Ton":[{label:"GPHH34831A | 13.4 SEER2 | 6.7 HSPF2 | 45,000 BTU | AHRI 216759869",equip:3567}],"5 Ton":[{label:"GPHH36031A | 13.4 SEER2 | 6.7 HSPF2 | 56,000 BTU | AHRI 216759885",equip:3782}]},
+  "GPDM3 – 13.4 SEER2 Dual Fuel":{"2 Ton":[{label:"GPDM32406041A | 13.4 SEER2 | 6.7 HSPF2 | 23,800 BTU | AHRI 209319576",equip:2997}],"3 Ton":[{label:"GPDM33608041A | 13.4 SEER2 | 6.7 HSPF2 | 34,200 BTU | AHRI 209319582",equip:3349}],"4 Ton":[{label:"GPDM34810041A | 13.4 SEER2 | 6.7 HSPF2 | 44,500 BTU | AHRI 209319585",equip:3785}]}
+},
+"Packaged Gas/Electric":{
+  "GPGM5 – 15.2 SEER2 / 81% AFUE":{"2 Ton":[{label:"GPGM52406031A | 15.2 SEER2 | 23,800 BTU | AHRI 216574765",equip:3865}],"3 Ton":[{label:"GPGM53608031A | 15.2 SEER2 | 35,600 BTU | AHRI 216574767",equip:4400}],"4 Ton":[{label:"GPGM54810031A | 15.2 SEER2 | 46,000 BTU | AHRI 216574769",equip:5100}],"5 Ton":[{label:"GPGM56014031A | 15.4 SEER2 | 59,000 BTU | AHRI 216574770",equip:5929}]},
+  "GPGM3 – 13.4 SEER2 / 81% AFUE":{"2 Ton":[{label:"GPGM32406031A | 13.4 SEER2 | 22,800 BTU | AHRI 216574788",equip:2827}],"3 Ton":[{label:"GPGM33608031A | 13.4 SEER2 | 33,800 BTU | AHRI 216574790",equip:3133}],"4 Ton":[{label:"GPGM34810031A | 13.4 SEER2 | 46,000 BTU | AHRI 216574792",equip:4225}],"5 Ton":[{label:"GPGM36012031A | 13.4 SEER2 | 56,000 BTU | AHRI 216574793",equip:4486}]}
+}};
+
+let margin=40,fin=false,crane=false,up=false,lp=0,lg=0,mode='quote',cid=null,fst='all';
+const JK='tbyrds_jobs_v4',SK='tbyrds_settings_v1';
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+const pn=s=>parseFloat((s||'').toString().replace(/[^0-9.]/g,''))||0;
+
+function ls(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{target:50000,overhead:30000,days:22};}catch{return{target:50000,overhead:30000,days:22};}}
+function ss(){const s={target:pn(document.getElementById('stgt').value)||50000,overhead:pn(document.getElementById('soh').value)||30000,days:pn(document.getElementById('sdays').value)||22};try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
+function is(){const s=ls();document.getElementById('stgt').value=s.target.toLocaleString('en-US');document.getElementById('soh').value=s.overhead.toLocaleString('en-US');document.getElementById('sdays').value=s.days;}
+function lj(){try{const r=localStorage.getItem(JK);return r?JSON.parse(r):[];}catch{return[];}}
+function sj2(jobs){try{localStorage.setItem(JK,JSON.stringify(jobs));}catch(e){alert('Storage error');}}
+
+function gmj(){
+  const jobs=lj(),now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
+  return jobs.filter(j=>{
+    if(j.status!=='Completed')return false;
+    const ds=j.completedDate||j.date||'';if(!ds)return false;
+    const d=new Date(ds);if(isNaN(d.getTime()))return false;
+    return d.getFullYear()===cy&&d.getMonth()===cm;
+  });
+}
+function jgp(j){
+  if(j.actuals&&j.actuals.actSalePrice>0){
+    const c=j.actuals.actEquip+j.actuals.actTax+j.actuals.actMaterials+j.actuals.actPermit+j.actuals.actCrane+j.actuals.actInstaller+j.actuals.actComm+(j.actuals.actMkt||0)+j.actuals.actFin;
+    return j.actuals.actSalePrice-c;
+  }
+  return j.gp||0;
+}
+
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('visible'));
+  document.getElementById('screen-'+s).classList.add('visible');
+  document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('active',(s==='jobs'&&i===0)||(s==='tracker'&&i===1)||(s==='quote'&&i===2)));
+  if(s==='jobs')rl();
+  if(s==='tracker')rt();
+}
+
+function rt(){
+  const s=ls(),mj=gmj(),now=new Date();
+  const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const wd=s.days||22,dom=now.getDate(),wde=Math.round((dom/dim)*wd),wdl=Math.max(wd-wde,0);
+  let tgp=0;mj.forEach(j=>tgp+=jgp(j));
+  const tgt=s.target||50000,oh=s.overhead||30000,gpn=Math.max(tgt-tgp,0);
+  const gpda=wde>0?tgp/wde:0,proj=gpda*wd,gpdn=wdl>0?gpn/wdl:0;
+  let zone,stat,hc;
+  if(tgp<oh){zone='🔴 Below overhead — hold firm on margin';stat=fmt(oh-tgp)+' needed to cover overhead';hc='danger';}
+  else if(tgp<tgt){zone='🟡 Overhead covered — on track to target';stat=fmt(gpn)+' to hit monthly target';hc='on-track';}
+  else{zone='🟢 Above target — room to be aggressive';stat=fmt(tgp-tgt)+' above target';hc='ahead';}
+  const h=document.getElementById('thero');h.className='thero '+hc;
+  document.getElementById('thzone').textContent=zone;
+  document.getElementById('thstat').textContent=stat;
+  document.getElementById('thgp').textContent=fmt(tgp);
+  document.getElementById('thgpsub').textContent=(tgp/tgt*100).toFixed(1)+'% of target';
+  document.getElementById('thtgt').textContent=fmt(tgt);
+  document.getElementById('thoh').textContent=fmt(oh);
+  document.getElementById('thohsub').textContent=tgp>=oh?'✓ covered':'not yet covered';
+  document.getElementById('thjobs').textContent=mj.length;
+  const pct=Math.min((tgp/tgt)*100,100);
+  document.getElementById('pbfill').style.width=pct+'%';
+  document.getElementById('pbohlbl').textContent='Overhead ('+(oh/tgt*100).toFixed(0)+'%)';
+  document.getElementById('pde').textContent=wde+' of '+wd+' work days';
+  document.getElementById('pdl').textContent=wdl+' work days';
+  const pa=document.getElementById('pda');pa.textContent=fmt(gpda)+'/day';pa.className='pval '+(gpda>=gpdn?'gn':'rd');
+  document.getElementById('pdn').textContent=fmt(gpdn)+'/day';
+  const pp=document.getElementById('pdp');pp.textContent=fmt(proj);pp.className='pval '+(proj>=tgt?'gn':proj>=oh?'am':'rd');
+  const pdg=document.getElementById('pdg');
+  if(tgp>=tgt){pdg.textContent='Target hit!';pdg.className='pval gn';}
+  else{pdg.textContent=fmt(gpn);pdg.className='pval rd';}
+  const mc=document.getElementById('mjcard'),ml=document.getElementById('mjlist');
+  if(mj.length>0){
+    mc.style.display='block';
+    ml.innerHTML=mj.map(j=>{const g=jgp(j),lbl=j.actuals&&j.actuals.actSalePrice>0?'actual':'quoted';return`<div class="minij"><div><div class="minn">${j.customerName}</div><div class="minm">${j.system} · ${j.completedDate||j.date}</div></div><div style="text-align:right"><div class="mingp">${fmt(g)}</div><div style="font-size:10px;color:var(--g500);margin-top:1px">${lbl}</div></div></div>`;}).join('');
+  } else mc.style.display='none';
+  cf();
+}
+
+function cf(){
+  const js=pn(document.getElementById('fjsize').value);
+  const res=document.getElementById('flres');
+  if(js<=0){res.style.display='none';return;}
+  const s=ls(),mj=gmj();
+  let tgp=0;mj.forEach(j=>tgp+=jgp(j));
+  const oh=s.overhead||30000,tgt=s.target||50000;
+  const gtn=Math.max(tgt-tgp,0),gton=Math.max(oh-tgp,0);
+  const mgd=gton>0?Math.min(gton,js*0.10):0;
+  const fp=js>0?(mgd/js)*100:0;
+  res.style.display='block';
+  document.getElementById('frgpn').textContent=fmt(gtn);
+  document.getElementById('frmgp').textContent=fmt(mgd);
+  document.getElementById('frfl').textContent=fp.toFixed(1)+'%';
+  const v=document.getElementById('frverd');
+  if(tgp>=oh){v.className='frverdict frv-ok';v.textContent='Overhead covered — you have room to be competitive. Standard pricing still recommended.';}
+  else if(tgp>=oh*0.75){v.className='frverdict frv-warn';v.textContent='Getting close to overhead — be selective. Hold at least '+fp.toFixed(0)+'% on this job.';}
+  else{v.className='frverdict frv-bad';v.textContent='Below overhead — hold firm. Do not go below '+fp.toFixed(0)+'% on this job.';}
+}
+
+function sm(m){
+  mode=m;
+  document.getElementById('qc').style.display=m==='quote'?'block':'none';
+  document.getElementById('jcc').style.display=m==='jobcost'?'block':'none';
+  document.getElementById('mmq').classList.toggle('active',m==='quote');
+  document.getElementById('mmjc').classList.toggle('active',m==='jobcost');
+  if(m==='jobcost')pfa();
+}
+function setM(p,el){margin=p;document.querySelectorAll('.mpill').forEach(x=>x.classList.remove('active'));el.classList.add('active');up=false;calc();}
+function tog(w){if(w==='fin'){fin=!fin;document.getElementById('togFin').classList.toggle('active',fin);}if(w==='crane'){crane=!crane;document.getElementById('togCrane').classList.toggle('active',crane);}up=false;calc();}
+function ps(el,keys){el.innerHTML='';keys.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;el.appendChild(o);});}
+function uSeries(){ps(document.getElementById('series'),Object.keys(DATA[document.getElementById('sysType').value]));uSizes();}
+function uSizes(){const sys=document.getElementById('sysType').value,ser=document.getElementById('series').value;ps(document.getElementById('tonnage'),Object.keys(DATA[sys][ser]));uMatchups();}
+function uMatchups(){
+  const sys=document.getElementById('sysType').value,ser=document.getElementById('series').value,ton=document.getElementById('tonnage').value;
+  const list=DATA[sys][ser][ton];const mu=document.getElementById('matchup');mu.innerHTML='';
+  list.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.label;mu.appendChild(o);});
+  up=false;calc();
+}
+function omc(){up=false;calc();}
+function gm(){
+  const sys=document.getElementById('sysType').value,ser=document.getElementById('series').value,ton=document.getElementById('tonnage').value,idx=parseInt(document.getElementById('matchup').value)||0;
+  return{m:DATA[sys][ser][ton][idx],ser,ton};
+}
+function ct(eq){
+  const cp=margin>=40?0.08:margin>=30?0.07:0.06,ip=0.07,fp=fin?0.10:0,mp=0.07;
+  const tax=eq*0.07,fx=eq+tax+600+150+(crane?500:0);
+  const d=1-margin/100-cp-ip-fp-mp;if(d<=0)return null;
+  return{price:fx/d,cp,tax};
+}
+function cf2(sp,eq){
+  const cp=margin>=40?0.08:margin>=30?0.07:0.06,ip=0.07,fp=fin?0.10:0,mp=0.07;
+  const tax=eq*0.07,fx=eq+tax+600+150+(crane?500:0);
+  const inst=sp*ip,comm=sp*cp,finA=sp*fp,mkt=sp*mp;
+  const cogs=fx+inst+comm+finA+mkt,gp=sp-cogs,gpp=sp>0?(gp/sp)*100:0;
+  const reb=eq*0.06,eg=gp+reb,egp=sp>0?(eg/sp)*100:0;
+  return{inst,comm,finA,mkt,cogs,gp,gpp,cp,tax,reb,eg,egp};
+}
+function calc(){
+  const{m,ser,ton}=gm();if(!m)return;
+  const eq=m.equip;let sp;
+  if(up){sp=pn(document.getElementById('spi').value);}
+  else{
+    const t=ct(eq);const w=document.getElementById('warn');
+    if(!t){w.style.display='block';w.textContent='Variable costs exceed target margin.';return;}
+    w.style.display='none';sp=t.price;
+    document.getElementById('spi').value=Math.round(sp).toLocaleString('en-US');
+  }
+  document.getElementById('warn').style.display='none';
+  const{inst,comm,finA,mkt,cogs,gp,gpp,cp,tax,reb,eg,egp}=cf2(sp,eq);
+  document.getElementById('gpd').textContent=fmt(gp);
+  document.getElementById('gppc').textContent=gpp.toFixed(1)+'% gross margin';
+  document.getElementById('gpf').style.width=Math.min(Math.max(gpp,0),100)+'%';
+  document.getElementById('rE').textContent=fmt(eq);
+  document.getElementById('rT').textContent=fmt(tax);
+  document.getElementById('rI').textContent=fmt(inst);
+  document.getElementById('clbl').innerHTML=`Commission (${Math.round(cp*100)}%) <span class="tag tv">variable</span>`;
+  document.getElementById('rC').textContent=fmt(comm);
+  document.getElementById('rMk').textContent=fmt(mkt);
+  document.getElementById('rCogs').textContent=fmt(cogs);
+  document.getElementById('craneBrow').style.display=crane?'flex':'none';
+  document.getElementById('finBrow').style.display=fin?'flex':'none';
+  if(fin)document.getElementById('rFin').textContent=fmt(finA);
+  document.getElementById('rReb').textContent='+'+fmt(reb);
+  document.getElementById('rEGP').textContent=fmt(eg);
+  document.getElementById('rEGPP').textContent=egp.toFixed(1)+'%';
+  const parts=m.label.split(' | ');
+  document.getElementById('muttl').textContent=ser+' – '+ton;
+  const ch=document.getElementById('mchips');ch.innerHTML='';
+  parts.forEach(p=>{const c=document.createElement('div');c.className='chip';c.textContent=p.trim();ch.appendChild(c);});
+  document.getElementById('muprev').style.display='block';
+  if(!up){lp=sp;lg=gp;}
+}
+function ope(){up=true;calc();}
+function opb(){const n=pn(document.getElementById('spi').value);document.getElementById('spi').value=Math.round(n).toLocaleString('en-US');}
+
+function onStatChange(){
+  const show=document.getElementById('jstat').value==='Completed';
+  document.getElementById('cdcard').style.display=show?'block':'none';
+  if(show&&!document.getElementById('cdate').value)document.getElementById('cdate').value=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function pfa(){
+  const{m}=gm();if(!m)return;
+  const eq=m.equip,tax=eq*0.07,sp=pn(document.getElementById('spi').value)||lp;
+  const cp=margin>=40?0.08:margin>=30?0.07:0.06;
+  const si=(id,v)=>{const el=document.getElementById(id);if(!el.value)el.value=Math.round(v).toLocaleString('en-US');};
+  si('aE',eq);si('aTx',tax);si('aM',600);si('aPm',150);si('aCr',crane?500:0);
+  si('aI',sp*0.07);si('aC',sp*cp);si('aMk',sp*0.07);si('aFin',fin?sp*0.10:0);si('aSP',sp);cjc();
+}
+function cjc(){
+  const aE=pn(document.getElementById('aE').value),aTx=pn(document.getElementById('aTx').value),aM=pn(document.getElementById('aM').value),aPm=pn(document.getElementById('aPm').value),aCr=pn(document.getElementById('aCr').value),aI=pn(document.getElementById('aI').value),aC=pn(document.getElementById('aC').value),aMk=pn(document.getElementById('aMk').value),aFin=pn(document.getElementById('aFin').value),aSP=pn(document.getElementById('aSP').value);
+  if(aSP===0)return;
+  const ac=aE+aTx+aM+aPm+aCr+aI+aC+aMk+aFin,agp=aSP-ac,agpp=aSP>0?(agp/aSP)*100:0;
+  const{m}=gm();const eq=m?m.equip:0,tax=eq*0.07,sp=lp||aSP,cp=margin>=40?0.08:margin>=30?0.07:0.06;
+  const qI=sp*0.07,qC=sp*cp,qMk=sp*0.07,qFin=fin?sp*0.10:0;
+  const qc=eq+tax+600+150+(crane?500:0)+qI+qC+qMk+qFin,qgp=sp-qc,qgpp=sp>0?(qgp/sp)*100:0;
+  document.getElementById('jchero').style.display='block';
+  document.getElementById('agpa').textContent=fmt(agp);document.getElementById('agpp').textContent=agpp.toFixed(1)+'% margin';
+  document.getElementById('qgpa').textContent=fmt(qgp);document.getElementById('qgpp').textContent=qgpp.toFixed(1)+'% margin';
+  document.getElementById('jcgpf').style.width=Math.min(Math.max(agpp,0),100)+'%';
+  const vc=(q,a,lib=true)=>{const d=a-q;if(Math.abs(d)<0.5)return'neu';return lib?(d<0?'pos':'neg'):(d>0?'pos':'neg');};
+  const row=(l,q,a,lib=true)=>{const d=a-q,c=vc(q,a,lib),s=d>0?'+':'';return`<tr><td>${l}</td><td class="r">${fmt(q)}</td><td class="r">${fmt(a)}</td><td class="${c}">${s}${fmt(d)}</td></tr>`;};
+  let rows=row('Equipment',eq,aE)+row('Tax',tax,aTx)+row('Materials',600,aM)+row('Permit',150,aPm)+row('Crane',crane?500:0,aCr)+row('Installer',qI,aI)+row('Commission',qC,aC)+row('Marketing',qMk,aMk)+row('Financing',qFin,aFin);
+  rows+=`<tr class="tr"><td>Total COGS</td><td class="r">${fmt(qc)}</td><td class="r">${fmt(ac)}</td><td class="${vc(qc,ac)}">${ac>qc?'+':''}${fmt(ac-qc)}</td></tr>`;
+  rows+=row('Sale price',sp,aSP,false);
+  rows+=`<tr class="tr"><td><strong>Gross profit</strong></td><td class="r"><strong>${fmt(qgp)}</strong></td><td class="r"><strong>${fmt(agp)}</strong></td><td class="${agp>=qgp?'pos':'neg'}"><strong>${agp>=qgp?'+':''}${fmt(agp-qgp)}</strong></td></tr>`;
+  document.getElementById('vbody').innerHTML=rows;
+}
+
+function sj(){
+  const name=document.getElementById('cname').value.trim();
+  if(!name){alert('Please enter a customer name.');return;}
+  const{m,ser,ton}=gm();
+  const sp=pn(document.getElementById('spi').value)||lp;
+  const eq=m?m.equip:0;const{gp,gpp}=cf2(sp,eq);
+  const status=document.getElementById('jstat').value;
+  const cd=status==='Completed'?document.getElementById('cdate').value:'';
+  const actuals=mode==='jobcost'?{actEquip:pn(document.getElementById('aE').value),actTax:pn(document.getElementById('aTx').value),actMaterials:pn(document.getElementById('aM').value),actPermit:pn(document.getElementById('aPm').value),actCrane:pn(document.getElementById('aCr').value),actInstaller:pn(document.getElementById('aI').value),actComm:pn(document.getElementById('aC').value),actMkt:pn(document.getElementById('aMk').value),actFin:pn(document.getElementById('aFin').value),actSalePrice:pn(document.getElementById('aSP').value)}:null;
+  const job={id:cid||Date.now().toString(),customerName:name,status,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),completedDate:cd,system:ser+' – '+ton,matchupLabel:m?m.label:'',equip:eq,fin,crane,margin,salePrice:sp,gp,gpPct:gpp,actuals};
+  const jobs=lj();const idx=jobs.findIndex(j=>j.id===job.id);
+  if(idx>=0)jobs[idx]=job;else jobs.unshift(job);
+  sj2(jobs);cid=null;go('jobs');
+}
+function dj(){
+  if(!cid||!confirm('Delete this job?'))return;
+  sj2(lj().filter(j=>j.id!==cid));cid=null;go('jobs');
+}
+function fj(st,el){fst=st;document.querySelectorAll('.fpill').forEach(s=>s.classList.remove('active'));el.classList.add('active');rl();}
+
+function rl(){
+  const jobs=lj(),filtered=fst==='all'?jobs:jobs.filter(j=>j.status===fst);
+  const el=document.getElementById('jlist');
+  if(filtered.length===0){el.innerHTML=`<div class="empty"><i class="ti ti-file-dollar"></i><p>${fst==='all'?'No jobs yet. Tap New quote to get started.':'No '+fst+' jobs.'}</p></div>`;return;}
+  el.innerHTML=filtered.map(j=>{
+    const gc=j.gpPct>=38?'gn':j.gpPct>=30?'':j.gpPct>=20?'am':'rd';
+    const sc=j.status==='Quoted'?'sb-q':j.status==='Sold'?'sb-s':'sb-c';
+    const ac=j.status.toLowerCase();
+    let ag='<div class="jm"><div class="jml">Actual GP</div><div class="jmv mu">—</div></div>';
+    let vr='<div class="jm"><div class="jml">GP variance</div><div class="jmv mu">—</div></div>';
+    if(j.actuals&&j.actuals.actSalePrice>0){
+      const c=j.actuals.actEquip+j.actuals.actTax+j.actuals.actMaterials+j.actuals.actPermit+j.actuals.actCrane+j.actuals.actInstaller+j.actuals.actComm+(j.actuals.actMkt||0)+j.actuals.actFin;
+      const g=j.actuals.actSalePrice-c,p=j.actuals.actSalePrice>0?(g/j.actuals.actSalePrice)*100:0,va=g-j.gp;
+      ag=`<div class="jm"><div class="jml">Actual GP</div><div class="jmv ${p>=38?'gn':p>=25?'am':'rd'}">${p.toFixed(1)}%</div></div>`;
+      vr=`<div class="jm"><div class="jml">GP variance</div><div class="jmv ${va>=0?'gn':'rd'}">${va>=0?'+':''}${fmt(va)}</div></div>`;
+    }
+    return`<div class="jcard" onclick="oj('${j.id}')"><div class="jacc ${ac}"></div><div class="jbody"><div class="jtop"><div><div class="jname">${j.customerName}</div><div class="jmeta">${j.system} · ${j.completedDate||j.date}</div></div><span class="sbadge ${sc}">${j.status}</span></div><div class="jmet"><div class="jm"><div class="jml">Sale price</div><div class="jmv">${fmt(j.salePrice)}</div></div><div class="jm"><div class="jml">Quoted GP</div><div class="jmv ${gc}">${j.gpPct.toFixed(1)}%</div></div>${ag}${vr}</div></div></div>`;
+  }).join('');
+}
+
+function oj(id){
+  const j=lj().find(x=>x.id===id);if(!j)return;
+  rf();cid=id;
+  document.getElementById('fttl').textContent='Edit job';
+  document.getElementById('cname').value=j.customerName;
+  document.getElementById('jstat').value=j.status;
+  document.getElementById('dbtn').style.display='flex';
+  if(j.status==='Completed'){document.getElementById('cdcard').style.display='block';document.getElementById('cdate').value=j.completedDate||j.date||'';}
+  fin=j.fin||false;crane=j.crane>0;margin=j.margin||40;up=true;
+  document.getElementById('togFin').classList.toggle('active',fin);
+  document.getElementById('togCrane').classList.toggle('active',crane);
+  document.querySelectorAll('.mpill').forEach(p=>p.classList.toggle('active',parseInt(p.textContent)===margin));
+  const sysKeys=Object.keys(DATA);let matched=false;
+  for(const sys of sysKeys){
+    for(const ser of Object.keys(DATA[sys])){
+      if(j.system.startsWith(ser)){
+        matched=true;
+        document.getElementById('sysType').value=sys;
+        ps(document.getElementById('series'),Object.keys(DATA[sys]));
+        document.getElementById('series').value=ser;
+        const tk=Object.keys(DATA[sys][ser]);
+        ps(document.getElementById('tonnage'),tk);
+        const ton=j.system.split(' – ')[1];
+        if(ton&&tk.includes(ton))document.getElementById('tonnage').value=ton;
+        const list=DATA[sys][ser][document.getElementById('tonnage').value];
+        const mu=document.getElementById('matchup');mu.innerHTML='';
+        list.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.label;mu.appendChild(o);});
+        for(let i=0;i<mu.options.length;i++){if(mu.options[i].text===j.matchupLabel){mu.selectedIndex=i;break;}}
+        break;
+      }
+    }
+    if(matched)break;
+  }
+  document.getElementById('spi').value=Math.round(j.salePrice).toLocaleString('en-US');
+  calc();lp=j.salePrice;lg=j.gp;
+  if(j.actuals){
+    sm('jobcost');const a=j.actuals;
+    const sv=(id,v)=>{document.getElementById(id).value=v>0?Math.round(v).toLocaleString('en-US'):'';};
+    sv('aE',a.actEquip);sv('aTx',a.actTax);sv('aM',a.actMaterials);sv('aPm',a.actPermit);
+    sv('aCr',a.actCrane);sv('aI',a.actInstaller);sv('aC',a.actComm);sv('aMk',a.actMkt||0);sv('aFin',a.actFin);sv('aSP',a.actSalePrice);
+    cjc();
+  }
+  go('quote');
+}
+
+function rf(){
+  cid=null;fin=false;crane=false;margin=40;up=false;mode='quote';
+  document.getElementById('fttl').textContent='New quote';
+  document.getElementById('cname').value='';
+  document.getElementById('jstat').value='Quoted';
+  document.getElementById('cdcard').style.display='none';
+  document.getElementById('cdate').value='';
+  document.getElementById('dbtn').style.display='none';
+  document.getElementById('togFin').classList.remove('active');
+  document.getElementById('togCrane').classList.remove('active');
+  document.querySelectorAll('.mpill').forEach(p=>p.classList.toggle('active',parseInt(p.textContent)===40));
+  ['aE','aTx','aM','aPm','aCr','aI','aC','aMk','aFin','aSP'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('jchero').style.display='none';
+  document.getElementById('muprev').style.display='none';
+  sm('quote');
+}
+
+const now=new Date();
+document.getElementById('mbadge').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+ps(document.getElementById('sysType'),Object.keys(DATA));
+uSeries();is();rl();
+</script>
+</body>
+</html>
