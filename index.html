@@ -650,9 +650,12 @@ select.ssel{font-size:13px;font-weight:500;padding:6px 10px;border-radius:var(--
 
 <!-- ══ SETTINGS ══ -->
 <div class="screen" id="screen-settings">
-  <div class="settings-hero">
-    <div class="sh-icon"><i class="ti ti-building" style="color:#fff;font-size:22px"></i></div>
-    <div><div class="sh-title">App settings</div><div class="sh-sub">Company profile &amp; preferences</div></div>
+  <div class="settings-hero" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="sh-icon"><i class="ti ti-building" style="color:#fff;font-size:22px"></i></div>
+      <div><div class="sh-title">App settings</div><div class="sh-sub">Company profile &amp; preferences</div></div>
+    </div>
+    <button id="adminBtn" onclick="showAdminScreen()" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:var(--font)">Admin</button>
   </div>
   <div class="setcard">
     <div class="shdr">Company profile</div>
@@ -765,6 +768,7 @@ function saveCompanySettings(){
   };
   try{localStorage.setItem(CK,JSON.stringify(c));}catch(e){}
   applyCompany(c);
+  saveCompanySettingsRemote(c).catch(e=>console.warn('Company settings sync failed:',e));
 }
 function applyCompany(c){
   if(!c)return;
@@ -827,36 +831,44 @@ function pp(n){
   pinEntry+=n.toString();
   document.getElementById('pd'+(pinEntry.length-1)).classList.add('filled');
   if(pinEntry.length===4){
-    setTimeout(()=>{
-      const c=loadCompany();
-      const userPin=c&&c.pin?c.pin:'';
-      // Check master PIN first
+    setTimeout(async()=>{
+      // Master PIN — always works, show admin option
       if(pinEntry===MASTER_PIN){
         sessionStorage.setItem('tbyrds_auth','master');
-        hidePinScreen();pinEntry='';
+        hidePinScreen();
+        const entered=pinEntry;pinEntry='';
         document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('filled'));
+        // Show admin shortcut toast
+        setTimeout(()=>{
+          if(confirm('Master access granted. Open admin panel?'))showAdminScreen();
+        },300);
         return;
       }
-      // Check if trial PIN is expired
-      const trialExpiry=c&&c.trialExpiry?c.trialExpiry:null;
-      if(trialExpiry&&Date.now()>trialExpiry){
-        // Show expired screen
-        document.getElementById('pinExpired').style.display='block';
-        document.querySelectorAll('.pdot').forEach(d=>{d.classList.remove('filled');d.classList.add('error');});
-        document.getElementById('pinErr').textContent='Trial expired';
-        setTimeout(()=>{document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('error'));pinEntry='';},800);
-        return;
-      }
-      // Check user PIN
-      if(pinEntry===userPin){
-        const expiry=trialExpiry||Date.now()+(24*60*60*1000*365); // no expiry if no trial set
+      // Validate against Supabase licenses
+      document.getElementById('pinErr').textContent='Checking…';
+      const result=await checkLicenseValid(pinEntry);
+      if(result.valid){
+        const expiry=result.license?new Date(result.license.expires_at).getTime():Date.now()+(365*24*60*60*1000);
         sessionStorage.setItem('tbyrds_auth',JSON.stringify({expires:expiry}));
+        // Store company name if available
+        if(result.license){
+          const c=loadCompany()||{};c.name=result.license.company_name;
+          try{localStorage.setItem(CK,JSON.stringify(c));}catch(e){}
+          applyCompany(c);
+        }
         hidePinScreen();pinEntry='';
         document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('filled'));
       } else {
+        const expired=result.reason&&result.reason.toLowerCase().includes('expir');
+        const revoked=result.reason&&result.reason.toLowerCase().includes('revok');
+        if(expired||revoked){
+          document.getElementById('pinExpired').style.display='block';
+          document.getElementById('pinErr').textContent=result.reason||'Access denied';
+        } else {
+          document.getElementById('pinErr').textContent=result.reason||'Incorrect PIN';
+        }
         document.querySelectorAll('.pdot').forEach(d=>{d.classList.remove('filled');d.classList.add('error');});
-        document.getElementById('pinErr').textContent='Incorrect PIN';
-        setTimeout(()=>{document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErr').textContent='';pinEntry='';},800);
+        setTimeout(()=>{document.querySelectorAll('.pdot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErr').textContent='';pinEntry='';},1200);
       }
     },100);
   }
@@ -868,15 +880,134 @@ function pd(){
   document.getElementById('pinErr').textContent='';
 }
 
-/* ══ ADMIN: Generate trial PIN ══
-   Access by entering master PIN 4695 then typing "ADMIN" in company name field
-   For now: entering master PIN gives full access; trial PIN = company PIN with 24hr expiry stored in CK */
-function generateTrialPin(pin){
-  const c=loadCompany()||{};
-  c.pin=pin;
-  c.trialExpiry=Date.now()+(24*60*60*1000); // 24 hours from now
-  try{localStorage.setItem(CK,JSON.stringify(c));}catch(e){}
-  return c.trialExpiry;
+/* ══ LICENSE MANAGEMENT ══ */
+async function loadLicenses(){
+  try{
+    const rows=await sbFetch('GET','licenses?select=*&order=created_at.desc');
+    return rows||[];
+  }catch(e){return[];}
+}
+async function createLicense(pin,companyName,email,hours){
+  const expires=new Date(Date.now()+hours*60*60*1000).toISOString();
+  try{
+    await sbFetch('POST','licenses?on_conflict=pin',{pin,company_name:companyName,email,expires_at:expires,active:true,created_at:new Date().toISOString()});
+    return true;
+  }catch(e){console.error(e);return false;}
+}
+async function revokeLicense(pin){
+  try{await sbFetch('PATCH','licenses?pin=eq.'+pin,{active:false});return true;}catch(e){return false;}
+}
+async function deleteLicense(pin){
+  try{await sbFetch('DELETE','licenses?pin=eq.'+pin,null);return true;}catch(e){return false;}
+}
+async function checkLicenseValid(pin){
+  if(pin===MASTER_PIN)return{valid:true,master:true};
+  try{
+    const rows=await sbFetch('GET','licenses?pin=eq.'+pin+'&select=*');
+    if(!rows||!rows.length)return{valid:false,reason:'PIN not found'};
+    const lic=rows[0];
+    if(!lic.active)return{valid:false,reason:'Access revoked'};
+    if(new Date(lic.expires_at)<new Date())return{valid:false,reason:'Trial expired'};
+    return{valid:true,license:lic};
+  }catch(e){
+    // offline fallback — check local
+    const c=loadCompany();
+    if(c&&c.pin===pin){
+      if(c.trialExpiry&&Date.now()>c.trialExpiry)return{valid:false,reason:'Trial expired'};
+      return{valid:true};
+    }
+    return{valid:false,reason:'Could not verify'};
+  }
+}
+
+/* ══ ADMIN SCREEN ══ */
+function showAdminScreen(){
+  // Build admin modal
+  const existing=document.getElementById('adminModal');
+  if(existing)existing.remove();
+  const modal=document.createElement('div');
+  modal.id='adminModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto';
+  modal.innerHTML=`
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:440px;overflow:hidden;margin-top:20px">
+      <div style="background:var(--navy-dark);padding:16px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#fff">Admin — License Manager</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Master access only</div>
+        </div>
+        <button onclick="document.getElementById('adminModal').remove()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:22px;cursor:pointer;padding:0">&times;</button>
+      </div>
+      <!-- Create license -->
+      <div style="padding:16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);margin-bottom:12px">Issue new license</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><div style="font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Company</div><input id="lic_company" type="text" placeholder="Acme HVAC" style="width:100%;padding:8px 10px;border:1px solid var(--border-dark);border-radius:8px;font-size:13px;font-family:var(--font)"></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Email</div><input id="lic_email" type="text" placeholder="owner@co.com" style="width:100%;padding:8px 10px;border:1px solid var(--border-dark);border-radius:8px;font-size:13px;font-family:var(--font)"></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">PIN (4 digits)</div><input id="lic_pin" type="text" placeholder="e.g. 5821" maxlength="4" inputmode="numeric" style="width:100%;padding:8px 10px;border:1px solid var(--border-dark);border-radius:8px;font-size:13px;font-family:var(--mono)"></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Trial hours</div><input id="lic_hours" type="text" placeholder="24" value="24" style="width:100%;padding:8px 10px;border:1px solid var(--border-dark);border-radius:8px;font-size:13px;font-family:var(--mono)"></div>
+        </div>
+        <button onclick="adminCreateLicense()" style="width:100%;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Issue license</button>
+        <div id="lic_msg" style="font-size:12px;margin-top:8px;text-align:center;min-height:16px"></div>
+      </div>
+      <!-- License list -->
+      <div style="padding:16px">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);margin-bottom:12px">Active licenses</div>
+        <div id="licList"><div style="text-align:center;color:var(--text-3);font-size:13px;padding:16px">Loading…</div></div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  adminLoadLicenses();
+}
+async function adminCreateLicense(){
+  const company=document.getElementById('lic_company').value.trim();
+  const email=document.getElementById('lic_email').value.trim();
+  const pin=document.getElementById('lic_pin').value.trim();
+  const hours=parseFloat(document.getElementById('lic_hours').value)||24;
+  const msg=document.getElementById('lic_msg');
+  if(!company||!email||pin.length!==4){msg.style.color='var(--red)';msg.textContent='Fill in all fields. PIN must be 4 digits.';return;}
+  msg.style.color='var(--text-3)';msg.textContent='Creating…';
+  const ok=await createLicense(pin,company,email,hours);
+  if(ok){msg.style.color='var(--green)';msg.textContent='License issued for '+company+'!';document.getElementById('lic_company').value='';document.getElementById('lic_email').value='';document.getElementById('lic_pin').value='';adminLoadLicenses();}
+  else{msg.style.color='var(--red)';msg.textContent='Error — PIN may already exist.';}
+}
+async function adminLoadLicenses(){
+  const list=document.getElementById('licList');if(!list)return;
+  const lics=await loadLicenses();
+  if(!lics.length){list.innerHTML='<div style="text-align:center;color:var(--text-3);font-size:13px;padding:16px">No licenses issued yet</div>';return;}
+  list.innerHTML=lics.map(l=>{
+    const exp=new Date(l.expires_at);
+    const expired=exp<new Date();
+    const expStr=exp.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const statusColor=!l.active?'var(--red)':expired?'var(--amber)':'var(--green)';
+    const statusTxt=!l.active?'Revoked':expired?'Expired':'Active';
+    return`<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${l.company_name}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px">${l.email}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;background:${statusColor}22;color:${statusColor}">${statusTxt}</span>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--navy);background:var(--warm-mid);padding:3px 8px;border-radius:6px">${l.pin}</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Expires: ${expStr}</div>
+      <div style="display:flex;gap:6px">
+        ${l.active&&!expired?`<button onclick="adminRevoke('${l.pin}')" style="flex:1;background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);border-radius:6px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)">Revoke</button>`:''}
+        <button onclick="adminDelete('${l.pin}')" style="flex:1;background:var(--red-light);color:var(--red-dark);border:1px solid #F5C0BC;border-radius:6px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)">Delete</button>
+        ${!l.active||expired?`<button onclick="adminExtend('${l.pin}')" style="flex:1;background:var(--green-light);color:var(--green-dark);border:1px solid #B8DDC8;border-radius:6px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)">Extend 24h</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function adminRevoke(pin){if(!confirm('Revoke access for PIN '+pin+'?'))return;await revokeLicense(pin);adminLoadLicenses();}
+async function adminDelete(pin){if(!confirm('Permanently delete license '+pin+'?'))return;await deleteLicense(pin);adminLoadLicenses();}
+async function adminExtend(pin){
+  try{
+    const exp=new Date(Date.now()+24*60*60*1000).toISOString();
+    await sbFetch('PATCH','licenses?pin=eq.'+pin,{active:true,expires_at:exp});
+    adminLoadLicenses();
+  }catch(e){alert('Error extending license');}
 }
 
 /* ══ SUPABASE ══ */
@@ -918,12 +1049,52 @@ async function syncLocalToRemote(){
 }
 async function getJobs(){return loadJobsRemote();}
 
-/* ══ LOCAL STORAGE ══ */
+/* ══ LOCAL STORAGE (jobs cache) ══ */
 function lj(){try{const r=localStorage.getItem(JK);return r?JSON.parse(r):[];}catch{return[];}}
 function sj2(jobs){try{localStorage.setItem(JK,JSON.stringify(jobs));}catch(e){}}
-function ls(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{target:50000,overhead:30000,days:22};}catch{return{target:50000,overhead:30000,days:22};}}
-function ss(){const s={target:pn(document.getElementById('stgt').value)||50000,overhead:pn(document.getElementById('soh').value)||30000,days:pn(document.getElementById('sdays').value)||22};try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
-function is(){const s=ls();document.getElementById('stgt').value=s.target.toLocaleString('en-US');document.getElementById('soh').value=s.overhead.toLocaleString('en-US');document.getElementById('sdays').value=s.days;}
+
+/* ══ SETTINGS via Supabase ══ */
+let _settingsCache=null;
+async function ls(){
+  if(_settingsCache)return _settingsCache;
+  try{
+    const rows=await sbFetch('GET','settings?key=eq.app_settings&select=value');
+    if(rows&&rows.length){_settingsCache=rows[0].value;return _settingsCache;}
+  }catch(e){}
+  // fallback to localStorage
+  try{const r=localStorage.getItem(SK);if(r)return JSON.parse(r);}catch(e){}
+  return{target:50000,overhead:30000,days:22};
+}
+function lsSync(){
+  // synchronous local fallback for tracker rendering
+  try{const r=localStorage.getItem(SK);if(r)return JSON.parse(r);}catch(e){}
+  return _settingsCache||{target:50000,overhead:30000,days:22};
+}
+async function ss(){
+  const s={target:pn(document.getElementById('stgt').value)||50000,overhead:pn(document.getElementById('soh').value)||30000,days:pn(document.getElementById('sdays').value)||22};
+  _settingsCache=s;
+  try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}
+  try{await sbFetch('POST','settings?on_conflict=key',{key:'app_settings',value:s,updated_at:new Date().toISOString()});}catch(e){}
+}
+async function is(){
+  const s=await ls();
+  document.getElementById('stgt').value=s.target.toLocaleString('en-US');
+  document.getElementById('soh').value=s.overhead.toLocaleString('en-US');
+  document.getElementById('sdays').value=s.days;
+  try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}
+}
+
+/* ══ COMPANY SETTINGS via Supabase ══ */
+async function saveCompanySettingsRemote(c){
+  try{await sbFetch('POST','settings?on_conflict=key',{key:'company_settings',value:c,updated_at:new Date().toISOString()});}catch(e){}
+}
+async function loadCompanyRemote(){
+  try{
+    const rows=await sbFetch('GET','settings?key=eq.company_settings&select=value');
+    if(rows&&rows.length)return rows[0].value;
+  }catch(e){}
+  return loadCompany();
+}
 
 /* ══ NAV ══ */
 function go(s){
@@ -932,6 +1103,11 @@ function go(s){
   document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('active',(s==='jobs'&&i===0)||(s==='tracker'&&i===1)||(s==='quote'&&i===2)||(s==='settings'&&i===3)));
   if(s==='jobs')rl().catch(e=>console.warn(e));
   if(s==='tracker')rt();
+  if(s==='settings'){
+    const isMaster=sessionStorage.getItem('tbyrds_auth')==='master';
+    const adminBtn=document.getElementById('adminBtn');
+    if(adminBtn)adminBtn.style.display=isMaster?'block':'none';
+  }
 }
 
 /* ══ PRIMARY SYSTEM (AHRI) ══ */
@@ -1286,7 +1462,7 @@ function jgp(j){
   return j.gp||0;
 }
 function rt(){
-  const s=ls(),now=new Date(),isCurrent=isCurrentMonth();
+  const s=lsSync(),now=new Date(),isCurrent=isCurrentMonth();
   const mj=getJobsForMonth(viewYear,viewMonth);
   document.getElementById('mnavLabel').textContent=MONTHS[viewMonth]+' '+viewYear;
   document.getElementById('mnavSub').textContent=isCurrent?'Current month':'Past month';
@@ -1393,8 +1569,9 @@ if(!company||!company.setupDone){
 // Init selectors
 ps(document.getElementById('sysType'),Object.keys(SYSTEMS));
 uSeries();
-migrate();is();
+migrate();
 (async()=>{
+  await is();
   try{
     if(!localStorage.getItem('tbyrds_synced'))await syncLocalToRemote();
     await rl();
